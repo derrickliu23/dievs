@@ -3,6 +3,8 @@ import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import api from "../api"
 import ReviewForm from "../components/ReviewForm"
+import { TIERS } from "../utils/tiers"
+import TierBadge from "../components/TierBadge"
 
 export default function WebtoonDetail() {
   const { id } = useParams()
@@ -29,12 +31,26 @@ export default function WebtoonDetail() {
 
   // add this function to handle saving the edit
 	async function handleEditSave(reviewId) {
-		await api.put(`/reviews/${reviewId}`, {
-				...editForm,
-				rating: parseInt(editForm.rating)
-		})
-		setEditingId(null)
-		fetchReviews()
+		try {
+			const payload = {
+					webtoon_id: parseInt(id),
+					...editForm,
+					rating: parseInt(editForm.rating)
+			}
+			console.log("Sending payload:", payload)
+			await api.put(`/reviews/${reviewId}`, payload)
+			setEditingId(null)
+			fetchReviews()
+		} catch (error) {
+			console.error("Error saving review:", error)
+			let errorMessage = "Failed to save review"
+			if (error.response?.data?.detail) {
+				errorMessage += `: ${error.response.data.detail}`
+			} else if (error.message) {
+				errorMessage += `: ${error.message}`
+			}
+			alert(errorMessage)
+		}
 	}
 
   if (!webtoon) return <p style={{ padding: 40, color: "#999" }}>loading...</p>
@@ -69,9 +85,7 @@ export default function WebtoonDetail() {
           <p style={styles.author}>by {webtoon.author}</p>
 
           <div style={styles.meta}>
-            {avgRating && (
-              <span style={styles.rating}>⭐ {avgRating} avg</span>
-            )}
+            {avgRating && <TierBadge value={Math.round(parseFloat(avgRating))} size="md" />}
             <span style={styles.reviewCount}>{reviews.length} reviews</span>
           </div>
 
@@ -107,16 +121,39 @@ export default function WebtoonDetail() {
               {editingId === review.id ? (
                 // --- edit mode ---
                 <div>
-                  <label style={styles.editLabel}>rating</label>
-                  <select
-                    style={styles.editInput}
-                    value={editForm.rating}
-                    onChange={e => setEditForm({ ...editForm, rating: e.target.value })}
-                  >
-                    {[5, 4, 3, 2, 1].map(n => (
-                      <option key={n} value={n}>{"★".repeat(n)} ({n})</option>
+                  {/* replace the rating select in edit mode with this */}
+                  <label style={styles.editLabel}>tier</label>
+                  <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
+                    {TIERS.map(tier => (
+                      <button
+                        key={tier.value}
+                        onClick={() => setEditForm({ ...editForm, rating: tier.value })}
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: 48,
+                          height: 48,
+                          borderRadius: 8,
+                          cursor: "pointer",
+                          background: tier.color,
+                          border: editForm.rating === tier.value
+                            ? `2px solid ${tier.text}`
+                            : `0.5px solid ${tier.border}`,
+                          color: tier.text,
+                          fontSize: 16,
+                          fontWeight: 600,
+                          transition: "transform 0.15s",
+                          transform: editForm.rating === tier.value ? "scale(1.1)" : "scale(1)",
+                          fontFamily: "inherit",
+                          gap: 2
+                        }}
+                      >
+                        {tier.label}
+                      </button>
                     ))}
-                  </select>
+                  </div>
 
                   <label style={styles.editLabel}>status</label>
                   <select
@@ -149,13 +186,7 @@ export default function WebtoonDetail() {
                 // --- view mode ---
                 <>
                   <div style={styles.reviewTop}>
-                    <div style={styles.stars}>
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <span key={i} style={{ color: i < review.rating ? "#111" : "#ddd" }}>
-                          ★
-                        </span>
-                      ))}
-                    </div>
+                    <TierBadge value={review.rating} size="md" />
                     <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                       <span style={{
                         ...styles.statusBadge,

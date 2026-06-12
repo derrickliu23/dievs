@@ -1,6 +1,7 @@
 // src/components/WebtoonCard.jsx
 import { useState } from "react"
 import api from "../api"
+import TierBadge from "./TierBadge"
 
 export default function WebtoonCard({ webtoon, review, onClick, onDeleted }) {
   const [hovered, setHovered] = useState(false)
@@ -55,9 +56,7 @@ export default function WebtoonCard({ webtoon, review, onClick, onDeleted }) {
           {webtoon.genre && (
             <p style={styles.genre}>{webtoon.genre.split(",")[0]}</p>
           )}
-          {review && (
-            <p style={styles.rating}>{"★".repeat(review.rating)}</p>
-          )}
+          {review && <TierBadge value={review.rating} size="sm" />}
         </div>
       </div>
     </div>

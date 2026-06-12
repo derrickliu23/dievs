@@ -21,8 +21,9 @@ def create_review(review: ReviewCreate, db: Session = Depends(get_db)):
     if not webtoon:
         raise HTTPException(status_code=404, detail="Webtoon not found")
 
-    if not 1 <= review.rating <= 5:
-        raise HTTPException(status_code=400, detail="Rating must be between 1 and 5")
+    # update both create and update routes
+    if not 1 <= review.rating <= 6:
+        raise HTTPException(status_code=400, detail="Rating must be between 1 and 6")
 
     # check if a review already exists for this webtoon
     existing = db.query(Review).filter(Review.webtoon_id == review.webtoon_id).first()
@@ -53,8 +54,9 @@ def update_review(review_id: int, review: ReviewCreate, db: Session = Depends(ge
         raise HTTPException(status_code=404, detail="Review not found")
 
     # validate rating
-    if not 1 <= review.rating <= 5:
-        raise HTTPException(status_code=400, detail="Rating must be between 1 and 5")
+    # update both create and update routes
+    if not 1 <= review.rating <= 6:
+        raise HTTPException(status_code=400, detail="Rating must be between 1 and 6")
 
     # update each field
     existing.rating  = review.rating

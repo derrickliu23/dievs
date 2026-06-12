@@ -1,27 +1,22 @@
 // src/components/ReviewForm.jsx
-
 import { useState } from "react"
 import api from "../api"
+import { TIERS } from "../utils/tiers"
 
 export default function ReviewForm({ webtoonId, onSuccess }) {
   const [form, setForm] = useState({
-    rating: 5,
+    rating: 5,    // default to A tier
     content: "",
     status: "reading"
   })
-
-  function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
 
   async function handleSubmit() {
     await api.post("/reviews/", {
       ...form,
       webtoon_id: webtoonId,
-      rating: parseInt(form.rating)  // ensure rating is a number not a string
+      rating: parseInt(form.rating)
     })
     onSuccess()
-    // reset the form after submitting
     setForm({ rating: 5, content: "", status: "reading" })
   }
 
@@ -29,28 +24,47 @@ export default function ReviewForm({ webtoonId, onSuccess }) {
     <div style={styles.form}>
       <h3 style={styles.heading}>write a review</h3>
 
-      {/* star rating — a simple dropdown for now */}
-      <label style={styles.label}>rating</label>
-      <select name="rating" value={form.rating} onChange={handleChange} style={styles.input}>
-        {[5, 4, 3, 2, 1].map(n => (
-          <option key={n} value={n}>{"⭐".repeat(n)} ({n})</option>
+      {/* tier picker */}
+      <label style={styles.label}>tier</label>
+      <div style={styles.tierRow}>
+        {TIERS.map(tier => (
+          <button
+            key={tier.value}
+            onClick={() => setForm({ ...form, rating: tier.value })}
+            style={{
+              ...styles.tierBtn,
+              background: tier.color,
+              border: form.rating === tier.value
+                ? `2px solid ${tier.text}`
+                : `0.5px solid ${tier.border}`,
+              color: tier.text,
+              transform: form.rating === tier.value ? "scale(1.1)" : "scale(1)"
+            }}
+          >
+            <span style={{ fontSize: 18, fontWeight: 600 }}>{tier.label}</span>
+            <span style={{ fontSize: 10, opacity: 0.8 }}>{tier.description}</span>
+          </button>
         ))}
-      </select>
+      </div>
 
-      {/* reading status */}
+      {/* status */}
       <label style={styles.label}>status</label>
-      <select name="status" value={form.status} onChange={handleChange} style={styles.input}>
+      <select
+        name="status"
+        value={form.status}
+        onChange={e => setForm({ ...form, status: e.target.value })}
+        style={styles.input}
+      >
         <option value="reading">reading</option>
         <option value="completed">completed</option>
         <option value="dropped">dropped</option>
       </select>
 
-      {/* written review — optional */}
+      {/* thoughts */}
       <label style={styles.label}>thoughts (optional)</label>
       <textarea
-        name="content"
         value={form.content}
-        onChange={handleChange}
+        onChange={e => setForm({ ...form, content: e.target.value })}
         placeholder="what did you think?"
         style={{ ...styles.input, height: 80, resize: "vertical" }}
       />
@@ -79,8 +93,27 @@ const styles = {
     display: "block",
     fontSize: 12,
     color: "#999",
-    marginBottom: 6,
+    marginBottom: 8,
     fontWeight: 500
+  },
+  tierRow: {
+    display: "flex",
+    gap: 8,
+    marginBottom: 16,
+    flexWrap: "wrap"
+  },
+  tierBtn: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 56,
+    height: 56,
+    borderRadius: 8,
+    cursor: "pointer",
+    transition: "transform 0.15s, border 0.15s",
+    gap: 2,
+    fontFamily: "inherit"
   },
   input: {
     display: "block",
@@ -93,7 +126,8 @@ const styles = {
     fontSize: 14,
     marginBottom: 14,
     outline: "none",
-    boxSizing: "border-box"
+    boxSizing: "border-box",
+    fontFamily: "inherit"
   },
   button: {
     padding: "10px 24px",
@@ -103,6 +137,7 @@ const styles = {
     borderRadius: 8,
     fontSize: 13,
     fontWeight: 600,
-    cursor: "pointer"
+    cursor: "pointer",
+    fontFamily: "inherit"
   }
 }
