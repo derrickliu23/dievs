@@ -166,6 +166,15 @@ export default function WebtoonDetail() {
                     <option value="dropped">dropped</option>
                   </select>
 
+                  <label style={styles.editLabel}>current chapter</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editForm.current_chapter}
+                    onChange={e => setEditForm({ ...editForm, current_chapter: parseInt(e.target.value) || 0 })}
+                    style={styles.editInput}
+                  />
+
                   <label style={styles.editLabel}>thoughts</label>
                   <textarea
                     style={{ ...styles.editInput, height: 80, resize: "vertical" }}
@@ -199,10 +208,12 @@ export default function WebtoonDetail() {
                         style={styles.editBtn}
                         onClick={() => {
                           setEditingId(review.id)
+                          // add to editForm state when clicking edit
                           setEditForm({
                             rating: review.rating,
                             content: review.content || "",
-                            status: review.status
+                            status: review.status,
+                            current_chapter: review.current_chapter || 0   // add this
                           })
                         }}
                       >
@@ -220,6 +231,9 @@ export default function WebtoonDetail() {
                       </button>
                     </div>
                   </div>
+                  {review.current_chapter > 0 && (
+                    <p style={styles.chapterBadge}>ch. {review.current_chapter}</p>
+                  )}
                   {review.content && (
                     <p style={styles.reviewContent}>{review.content}</p>
                   )}
@@ -456,5 +470,10 @@ const styles = {
     color: "#aaa",
     marginBottom: 24,
     fontStyle: "italic"
+  },
+  chapterBadge: {
+    fontSize: 12,
+    color: "#888",
+    fontWeight: 500
   }
 }

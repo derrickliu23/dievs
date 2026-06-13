@@ -37,9 +37,10 @@ class WebtoonResponse(BaseModel):
 
 class ReviewCreate(BaseModel):
     webtoon_id: int
-    rating: int           # must be 1-5, validated in the router
+    rating: int
     content: Optional[str] = None
     status: str = "reading"
+    current_chapter: Optional[int] = 0   # add this
 
 class ReviewResponse(BaseModel):
     id: int
@@ -47,6 +48,7 @@ class ReviewResponse(BaseModel):
     rating: int
     content: Optional[str]
     status: str
+    current_chapter: Optional[int]        # add this
     created_at: datetime
 
     class Config:

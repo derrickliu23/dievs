@@ -7,7 +7,8 @@ export default function ReviewForm({ webtoonId, onSuccess }) {
   const [form, setForm] = useState({
     rating: 5,    // default to A tier
     content: "",
-    status: "reading"
+    status: "reading",
+    current_chapter: 0    // add this
   })
 
   async function handleSubmit() {
@@ -59,6 +60,16 @@ export default function ReviewForm({ webtoonId, onSuccess }) {
         <option value="completed">completed</option>
         <option value="dropped">dropped</option>
       </select>
+
+      <label style={styles.label}>current chapter</label>
+      <input
+        type="number"
+        min="0"
+        value={form.current_chapter}
+        onChange={e => setForm({ ...form, current_chapter: parseInt(e.target.value) || 0 })}
+        placeholder="0"
+        style={styles.input}
+      />
 
       {/* thoughts */}
       <label style={styles.label}>thoughts (optional)</label>

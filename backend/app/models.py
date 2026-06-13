@@ -51,3 +51,6 @@ class Review(Base):
 
     # when this review was written
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    
+    # add this line to the Review class
+    current_chapter = Column(Integer, nullable=True, default=0)

@@ -58,6 +58,9 @@ export default function WebtoonCard({ webtoon, review, onClick, onDeleted }) {
           )}
           {review && <TierBadge value={review.rating} size="sm" />}
         </div>
+        {review?.current_chapter > 0 && (
+          <p style={styles.chapter}>ch. {review.current_chapter}</p>
+        )}
       </div>
     </div>
   )
@@ -155,5 +158,10 @@ const styles = {
     fontSize: 11,
     color: "#111",
     letterSpacing: 1
+  },
+  chapter: {
+    fontSize: 11,
+    color: "#aaa",
+    marginTop: 2
   }
 }
