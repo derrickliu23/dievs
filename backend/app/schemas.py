@@ -53,3 +53,19 @@ class ReviewResponse(BaseModel):
 
     class Config:
         from_attributes = True
+        
+        
+class ChapterNoteCreate(BaseModel):
+    webtoon_id: int
+    chapter: int
+    note: str
+
+class ChapterNoteResponse(BaseModel):
+    id: int
+    webtoon_id: int
+    chapter: int
+    note: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True

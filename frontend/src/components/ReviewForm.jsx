@@ -1,7 +1,7 @@
 // src/components/ReviewForm.jsx
 import { useState } from "react"
 import api from "../api"
-import { TIERS } from "../utils/tiers"
+import { getActiveSystem } from "../utils/tiers"
 
 export default function ReviewForm({ webtoonId, onSuccess }) {
   const [form, setForm] = useState({
@@ -10,6 +10,8 @@ export default function ReviewForm({ webtoonId, onSuccess }) {
     status: "reading",
     current_chapter: 0    // add this
   })
+
+  const system = getActiveSystem()
 
   async function handleSubmit() {
     await api.post("/reviews/", {
@@ -28,22 +30,20 @@ export default function ReviewForm({ webtoonId, onSuccess }) {
       {/* tier picker */}
       <label style={styles.label}>tier</label>
       <div style={styles.tierRow}>
-        {TIERS.map(tier => (
+        {system.levels.map(level => (
           <button
-            key={tier.value}
-            onClick={() => setForm({ ...form, rating: tier.value })}
+            key={level.value}
+            onClick={() => setForm({ ...form, rating: level.value })}
             style={{
               ...styles.tierBtn,
-              background: tier.color,
-              border: form.rating === tier.value
-                ? `2px solid ${tier.text}`
-                : `0.5px solid ${tier.border}`,
-              color: tier.text,
-              transform: form.rating === tier.value ? "scale(1.1)" : "scale(1)"
+              background: level.color,
+              border: form.rating === level.value ? `2px solid ${level.text}` : `0.5px solid ${level.border}`,
+              color: level.text,
+              transform: form.rating === level.value ? "scale(1.1)" : "scale(1)"
             }}
           >
-            <span style={{ fontSize: 18, fontWeight: 600 }}>{tier.label}</span>
-            <span style={{ fontSize: 10, opacity: 0.8 }}>{tier.description}</span>
+            <span style={{ fontSize: 14, fontWeight: 600 }}>{level.label}</span>
+            <span style={{ fontSize: 9, opacity: 0.8 }}>{level.description}</span>
           </button>
         ))}
       </div>

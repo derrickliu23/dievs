@@ -3,8 +3,9 @@ import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import api from "../api"
 import ReviewForm from "../components/ReviewForm"
-import { TIERS } from "../utils/tiers"
+import { getActiveSystem } from "../utils/tiers"
 import TierBadge from "../components/TierBadge"
+import ChapterNotes from "../components/ChapterNotes"
 
 export default function WebtoonDetail() {
   const { id } = useParams()
@@ -13,6 +14,7 @@ export default function WebtoonDetail() {
   const [reviews, setReviews] = useState([])
   const [editingId, setEditingId] = useState(null)
   const [editForm, setEditForm] = useState({ rating: 5, content: "", status: "reading" })
+  const system = getActiveSystem()
 
   useEffect(() => {
     fetchWebtoon()
@@ -124,33 +126,20 @@ export default function WebtoonDetail() {
                   {/* replace the rating select in edit mode with this */}
                   <label style={styles.editLabel}>tier</label>
                   <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
-                    {TIERS.map(tier => (
+                    {system.levels.map(level => (
                       <button
-                        key={tier.value}
-                        onClick={() => setEditForm({ ...editForm, rating: tier.value })}
+                        key={level.value}
+                        onClick={() => setForm({ ...form, rating: level.value })}
                         style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          width: 48,
-                          height: 48,
-                          borderRadius: 8,
-                          cursor: "pointer",
-                          background: tier.color,
-                          border: editForm.rating === tier.value
-                            ? `2px solid ${tier.text}`
-                            : `0.5px solid ${tier.border}`,
-                          color: tier.text,
-                          fontSize: 16,
-                          fontWeight: 600,
-                          transition: "transform 0.15s",
-                          transform: editForm.rating === tier.value ? "scale(1.1)" : "scale(1)",
-                          fontFamily: "inherit",
-                          gap: 2
+                          ...styles.tierBtn,
+                          background: level.color,
+                          border: form.rating === level.value ? `2px solid ${level.text}` : `0.5px solid ${level.border}`,
+                          color: level.text,
+                          transform: form.rating === level.value ? "scale(1.1)" : "scale(1)"
                         }}
                       >
-                        {tier.label}
+                        <span style={{ fontSize: 14, fontWeight: 600 }}>{level.label}</span>
+                        <span style={{ fontSize: 9, opacity: 0.8 }}>{level.description}</span>
                       </button>
                     ))}
                   </div>
@@ -247,6 +236,8 @@ export default function WebtoonDetail() {
             </div>
           ))}
         </div>
+        
+        <ChapterNotes webtoonId={parseInt(id)} />
       </div>
     </div>
   )

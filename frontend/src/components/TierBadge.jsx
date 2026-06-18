@@ -1,35 +1,38 @@
 // src/components/TierBadge.jsx
-import { getTier } from "../utils/tiers"
+import { getActiveSystem } from "../utils/tiers"
 
-// size can be "sm", "md", or "lg"
 export default function TierBadge({ value, size = "md" }) {
-  const tier = getTier(value)
+  const system = getActiveSystem()
+  const level = system.levels.find(l => l.value === value) || system.levels[system.levels.length - 1]
 
   const sizes = {
-    sm: { width: 28, height: 28, fontSize: 13 },
-    md: { width: 40, height: 40, fontSize: 18 },
-    lg: { width: 52, height: 52, fontSize: 22 }
+    sm: { minWidth: 28, height: 24, fontSize: 11, padding: "3px 6px" },
+    md: { minWidth: 40, height: 32, fontSize: 13, padding: "4px 8px" },
+    lg: { minWidth: 52, height: 40, fontSize: 15, padding: "5px 10px" }
   }
 
   const s = sizes[size]
 
   return (
     <div style={{
-      width: s.width,
+      minWidth: s.minWidth,
       height: s.height,
       borderRadius: 8,
-      background: tier.color,
-      border: `0.5px solid ${tier.border}`,
-      display: "flex",
+      background: level.color,
+      border: `0.5px solid ${level.border}`,
+      display: "inline-flex",       // shrinks/grows to fit content
       alignItems: "center",
       justifyContent: "center",
       fontSize: s.fontSize,
       fontWeight: 600,
-      color: tier.text,
+      color: level.text,
       fontFamily: "inherit",
-      flexShrink: 0
+      flexShrink: 0,
+      padding: s.padding,
+      whiteSpace: "nowrap",          // prevents wrapping mid-emoji
+      lineHeight: 1
     }}>
-      {tier.label}
+      {level.label}
     </div>
   )
 }

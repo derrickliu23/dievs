@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine
 from app import models
-from app.routers import webtoons, reviews
+from app.routers import webtoons, reviews, chapter_notes
 
 # create all tables in the database if they don't exist yet
 models.Base.metadata.create_all(bind=engine)
@@ -24,7 +24,9 @@ app.add_middleware(
 # register the routers — each one handles a group of related routes
 app.include_router(webtoons.router)
 app.include_router(reviews.router)
+app.include_router(chapter_notes.router)  # add this
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
+

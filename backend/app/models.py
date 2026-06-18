@@ -54,3 +54,13 @@ class Review(Base):
     
     # add this line to the Review class
     current_chapter = Column(Integer, nullable=True, default=0)
+    
+# add this new class
+class ChapterNote(Base):
+    __tablename__ = "chapter_notes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    webtoon_id = Column(Integer, nullable=False, index=True)
+    chapter = Column(Integer, nullable=False)
+    note = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))

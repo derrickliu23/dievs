@@ -6,6 +6,7 @@ import WebtoonCard from "../components/WebtoonCard"
 import WebtoonForm from "../components/WebtoonForm"
 import WebtoonSearch from "../components/WebtoonSearch"
 import Recommendations from "../components/Recommendations"
+import RatingSystemPicker from "../components/RatingSystemPicker"
 
 export default function Home() {
   const [webtoons, setWebtoons] = useState([])
@@ -13,6 +14,9 @@ export default function Home() {
   const [showForm, setShowForm] = useState(false)
   const [filters, setFilters] = useState({ status: "all", genre: "all", rating: "all" })
   const navigate = useNavigate()
+  const [searchQuery, setSearchQuery] = useState("")
+  const [sortBy, setSortBy] = useState("date_added")
+  const [, forceUpdate] = useState(0)
 
   useEffect(() => {
     fetchWebtoons()
@@ -47,30 +51,45 @@ export default function Home() {
   )].sort()
 
   // apply filters
-  const filtered = webtoons.filter(w => {
-    const review = reviewByWebtoon[w.id]
+  const filtered = webtoons
+    .filter(w => {
+      const review = reviewByWebtoon[w.id]
+      if (searchQuery && !w.title.toLowerCase().includes(searchQuery.toLowerCase())) return false
+      if (filters.status !== "all") {
+        if (!review || review.status !== filters.status) return false
+      }
+      if (filters.genre !== "all") {
+        if (!w.genre || !w.genre.toLowerCase().includes(filters.genre.toLowerCase())) return false
+      }
+      if (filters.rating !== "all") {
+        if (!review || review.rating < parseInt(filters.rating)) return false
+      }
+      return true
+    })
+    .sort((a, b) => {
+      const reviewA = reviewByWebtoon[a.id]
+      const reviewB = reviewByWebtoon[b.id]
 
-    // status filter — check the review's status
-    if (filters.status !== "all") {
-      if (!review || review.status !== filters.status) return false
-    }
+      if (sortBy === "title") {
+        return a.title.localeCompare(b.title)
+      }
+      if (sortBy === "tier_high") {
+        return (reviewB?.rating || 0) - (reviewA?.rating || 0)
+      }
+      if (sortBy === "tier_low") {
+        return (reviewA?.rating || 0) - (reviewB?.rating || 0)
+      }
+      if (sortBy === "chapter") {
+        return (reviewB?.current_chapter || 0) - (reviewA?.current_chapter || 0)
+      }
+      // default: date_added — newest first
+      return new Date(b.created_at) - new Date(a.created_at)
+    })
 
-    // genre filter — check if the webtoon's genre includes the selected one
-    if (filters.genre !== "all") {
-      if (!w.genre || !w.genre.toLowerCase().includes(filters.genre.toLowerCase())) return false
-    }
-
-    // rating filter — check review rating is >= selected minimum
-    if (filters.rating !== "all") {
-      if (!review || review.rating < parseInt(filters.rating)) return false
-    }
-
-    return true
-  })
-
-  const isFiltered = filters.status !== "all" || filters.genre !== "all" || filters.rating !== "all"
+  const isFiltered = searchQuery !== "" || filters.status !== "all" || filters.genre !== "all" || filters.rating !== "all"
 
   function clearFilters() {
+    setSearchQuery("")
     setFilters({ status: "all", genre: "all", rating: "all" })
   }
 
@@ -78,9 +97,18 @@ export default function Home() {
     <div style={styles.page}>
       <header style={styles.nav}>
         <span style={styles.logo}>dievs</span>
-        <button style={styles.addBtn} onClick={() => setShowForm(!showForm)}>
-          {showForm ? "cancel" : "+ add manually"}
-        </button>
+        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          <RatingSystemPicker onChange={() => forceUpdate(n => n + 1)} />
+          <button style={styles.statsBtn} onClick={() => navigate("/stats")}>
+            stats
+          </button>
+          <button style={styles.statsBtn} onClick={() => navigate("/wishlist")}>
+            wishlist
+          </button>
+          <button style={styles.addBtn} onClick={() => setShowForm(!showForm)}>
+            {showForm ? "cancel" : "+ add manually"}
+          </button>
+        </div>
       </header>
 
       <div style={styles.hero}>
@@ -100,6 +128,14 @@ export default function Home() {
                 {isFiltered ? `${filtered.length} of ${webtoons.length}` : `${webtoons.length} titles`}
               </span>
             </div>
+
+            {/* search your shelf */}
+            <input
+              style={styles.shelfSearch}
+              placeholder="search your shelf..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+            />
 
             {/* filter bar */}
             <div style={styles.filterBar}>
@@ -138,6 +174,19 @@ export default function Home() {
                 <option value="4">★★★★ and above</option>
                 <option value="3">★★★ and above</option>
                 <option value="2">★★ and above</option>
+              </select>
+
+              {/* sort dropdown */}
+              <select
+                style={styles.filterSelect}
+                value={sortBy}
+                onChange={e => setSortBy(e.target.value)}
+              >
+                <option value="date_added">newest added</option>
+                <option value="title">title (a-z)</option>
+                <option value="tier_high">highest tier</option>
+                <option value="tier_low">lowest tier</option>
+                <option value="chapter">most chapters read</option>
               </select>
 
               {/* clear button — only show when filters are active */}
@@ -282,5 +331,29 @@ const styles = {
     fontSize: 14,
     textAlign: "center",
     padding: "60px 0"
+  }, 
+  shelfSearch: {
+    width: "100%",
+    padding: "10px 16px",
+    background: "#f7f7f7",
+    border: "1px solid #eee",
+    borderRadius: 10,
+    color: "#111",
+    fontSize: 14,
+    outline: "none",
+    marginBottom: 14,
+    fontFamily: "inherit",
+    boxSizing: "border-box"
+  }, 
+  statsBtn: {
+    padding: "8px 16px",
+    background: "none",
+    color: "#111",
+    border: "1px solid #eee",
+    borderRadius: 8,
+    fontSize: 13,
+    fontWeight: 500,
+    cursor: "pointer",
+    fontFamily: "inherit"   // make sure this is here
   }
 }
