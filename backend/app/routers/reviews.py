@@ -62,6 +62,7 @@ def update_review(review_id: int, review: ReviewCreate, db: Session = Depends(ge
     existing.rating  = review.rating
     existing.content = review.content
     existing.status  = review.status
+    existing.current_chapter = review.current_chapter  # add this
 
     db.commit()
     db.refresh(existing)

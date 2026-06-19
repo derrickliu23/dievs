@@ -33,27 +33,22 @@ export default function WebtoonDetail() {
 
   // add this function to handle saving the edit
 	async function handleEditSave(reviewId) {
-		try {
-			const payload = {
-					webtoon_id: parseInt(id),
-					...editForm,
-					rating: parseInt(editForm.rating)
-			}
-			console.log("Sending payload:", payload)
-			await api.put(`/reviews/${reviewId}`, payload)
-			setEditingId(null)
-			fetchReviews()
-		} catch (error) {
-			console.error("Error saving review:", error)
-			let errorMessage = "Failed to save review"
-			if (error.response?.data?.detail) {
-				errorMessage += `: ${error.response.data.detail}`
-			} else if (error.message) {
-				errorMessage += `: ${error.message}`
-			}
-			alert(errorMessage)
-		}
-	}
+    try {
+      const payload = {
+        webtoon_id: parseInt(id),
+        rating: parseInt(editForm.rating),
+        content: editForm.content,
+        status: editForm.status,
+        current_chapter: editForm.current_chapter || 0
+      }
+      await api.put(`/reviews/${reviewId}`, payload)
+      setEditingId(null)
+      fetchReviews()
+    } catch (error) {
+      console.error("Error saving review:", error)
+      alert("Failed to save review: " + (error.response?.data?.detail || error.message))
+    }
+  }
 
   if (!webtoon) return <p style={{ padding: 40, color: "#999" }}>loading...</p>
 
@@ -129,13 +124,13 @@ export default function WebtoonDetail() {
                     {system.levels.map(level => (
                       <button
                         key={level.value}
-                        onClick={() => setForm({ ...form, rating: level.value })}
+                        onClick={() => setEditForm({ ...editForm, rating: level.value })}
                         style={{
                           ...styles.tierBtn,
                           background: level.color,
-                          border: form.rating === level.value ? `2px solid ${level.text}` : `0.5px solid ${level.border}`,
+                          border: editForm.rating === level.value ? `2px solid ${level.text}` : `0.5px solid ${level.border}`,
                           color: level.text,
-                          transform: form.rating === level.value ? "scale(1.1)" : "scale(1)"
+                          transform: editForm.rating === level.value ? "scale(1.1)" : "scale(1)"
                         }}
                       >
                         <span style={{ fontSize: 14, fontWeight: 600 }}>{level.label}</span>
@@ -236,7 +231,7 @@ export default function WebtoonDetail() {
             </div>
           ))}
         </div>
-        
+
         <ChapterNotes webtoonId={parseInt(id)} />
       </div>
     </div>
@@ -466,5 +461,19 @@ const styles = {
     fontSize: 12,
     color: "#888",
     fontWeight: 500
+  },
+  tierBtn: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 56,
+    height: 56,
+    borderRadius: 8,
+    cursor: "pointer",
+    transition: "transform 0.15s, border 0.15s",
+    gap: 2,
+    fontFamily: "inherit",
+    padding: 0
   }
 }
