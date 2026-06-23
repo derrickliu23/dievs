@@ -1,37 +1,94 @@
-/* src/index.css */
-
-/* import Inter from Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* reset */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-/* global defaults */
+/* light mode variables */
+:root {
+  --bg: #f0f2f5;
+  --bg-card: rgba(255, 255, 255, 0.55);
+  --bg-card-hover: rgba(255, 255, 255, 0.75);
+  --bg-input: rgba(255, 255, 255, 0.5);
+  --bg-nav: rgba(255, 255, 255, 0.4);
+  --border: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.12);
+  --text-primary: #0a0a0f;
+  --text-secondary: #555;
+  --text-muted: #999;
+  --accent: #0F6E56;
+  --accent-light: #E1F5EE;
+  --accent-border: #5DCAA5;
+  --accent-text: #085041;
+  --blob-1: rgba(15, 110, 86, 0.25);
+  --blob-2: rgba(83, 74, 183, 0.18);
+  --blob-3: rgba(29, 158, 117, 0.15);
+  --line-color: rgba(15, 110, 86, 0.12);
+  --panel-color: rgba(15, 110, 86, 0.10);
+}
+
+/* dark mode variables */
+[data-theme="dark"] {
+  --bg: #0a0a0f;
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-card-hover: rgba(255, 255, 255, 0.07);
+  --bg-input: rgba(255, 255, 255, 0.06);
+  --bg-nav: rgba(10, 10, 15, 0.6);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --text-primary: #f0f0f0;
+  --text-secondary: #aaa;
+  --text-muted: #555;
+  --accent: #1D9E75;
+  --accent-light: rgba(29, 158, 117, 0.15);
+  --accent-border: rgba(93, 202, 165, 0.4);
+  --accent-text: #5DCAA5;
+  --blob-1: rgba(15, 110, 86, 0.18);
+  --blob-2: rgba(83, 74, 183, 0.15);
+  --blob-3: rgba(29, 158, 117, 0.12);
+  --line-color: rgba(29, 158, 117, 0.08);
+  --panel-color: rgba(29, 158, 117, 0.06);
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #ffffff;
-  color: #111111;
+  background: var(--bg);
+  color: var(--text-primary);
   font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
 }
 
-/* remove default button styles */
-button {
-  font-family: inherit;
+button { font-family: inherit; }
+input, textarea, select { font-family: inherit; }
+a { text-decoration: none; color: inherit; }
+
+/* glass utility classes */
+.glass {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: var(--bg-card);
+  border: 0.5px solid var(--border);
 }
 
-/* remove default input styles */
-input, textarea, select {
-  font-family: inherit;
+.glass-strong {
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  background: var(--bg-nav);
+  border-bottom: 0.5px solid var(--border);
 }
 
-/* remove default link styles */
-a {
-  text-decoration: none;
-  color: inherit;
+.glass-input {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: var(--bg-input);
+  border: 0.5px solid var(--border);
+  color: var(--text-primary);
+  outline: none;
 }
+
+.glass-input::placeholder { color: var(--text-muted); }

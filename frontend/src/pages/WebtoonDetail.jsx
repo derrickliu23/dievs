@@ -7,7 +7,7 @@ import { getActiveSystem } from "../utils/tiers"
 import TierBadge from "../components/TierBadge"
 import ChapterNotes from "../components/ChapterNotes"
 
-export default function WebtoonDetail() {
+export default function WebtoonDetail({ onThemeToggle, theme }) {
   const { id } = useParams()
   const navigate = useNavigate()
   const [webtoon, setWebtoon] = useState(null)
@@ -59,11 +59,14 @@ export default function WebtoonDetail() {
   return (
     <div style={styles.page}>
       {/* nav */}
-      <header style={styles.nav}>
-        <button style={styles.back} onClick={() => navigate("/")}>
-          ← back
-        </button>
-        <span style={styles.logo}>dievs</span>
+      <header className="glass-strong" style={{ ...styles.nav, position: "sticky", top: 0, zIndex: 50 }}>
+        <button style={styles.back} onClick={() => navigate("/")}>← back</button>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <button style={styles.themeBtn} onClick={onThemeToggle}>
+            {theme === "dark" ? "☀️" : "🌙"}
+          </button>
+          <span style={styles.logo}>dievs</span>
+        </div>
       </header>
 
       {/* hero banner */}
@@ -239,35 +242,42 @@ export default function WebtoonDetail() {
 }
 
 const styles = {
-  page: {
-    minHeight: "100vh",
-    background: "#fff"
-  },
+  page: { minHeight: "100vh" },  // remove background: "#fff"
   nav: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "20px 40px",
-    borderBottom: "1px solid #f0f0f0"
+    padding: "16px 40px"
   },
   logo: {
     fontSize: 20,
-    fontWeight: 700,
-    letterSpacing: "-0.03em"
+    fontWeight: 500,
+    letterSpacing: "-0.03em",
+    color: "var(--text-primary)"
   },
   back: {
     background: "none",
     border: "none",
     fontSize: 14,
-    color: "#999",
+    color: "var(--text-muted)",
     cursor: "pointer",
-    fontWeight: 500
+    fontWeight: 500,
+    fontFamily: "inherit"
+  },
+  themeBtn: {
+    padding: "7px 10px",
+    background: "var(--bg-input)",
+    border: "0.5px solid var(--border)",
+    borderRadius: 8,
+    fontSize: 14,
+    cursor: "pointer",
+    backdropFilter: "blur(8px)"
   },
   hero: {
     display: "flex",
     gap: 40,
     padding: "48px 40px",
-    borderBottom: "1px solid #f0f0f0",
+    borderBottom: "0.5px solid var(--border)",
     maxWidth: 900,
     margin: "0 auto"
   },
@@ -277,12 +287,12 @@ const styles = {
     objectFit: "cover",
     borderRadius: 10,
     flexShrink: 0,
-    boxShadow: "0 8px 24px rgba(0,0,0,0.10)"
+    boxShadow: "0 8px 24px rgba(0,0,0,0.15)"
   },
   placeholder: {
     width: 180,
     height: 250,
-    background: "#f5f5f5",
+    background: "var(--bg-input)",
     borderRadius: 10,
     flexShrink: 0
   },
@@ -296,7 +306,7 @@ const styles = {
     fontSize: 11,
     fontWeight: 600,
     letterSpacing: "0.08em",
-    color: "#2563EB",
+    color: "var(--accent)",
     marginBottom: 10
   },
   title: {
@@ -304,11 +314,12 @@ const styles = {
     fontWeight: 700,
     letterSpacing: "-0.03em",
     lineHeight: 1.15,
-    marginBottom: 8
+    marginBottom: 8,
+    color: "var(--text-primary)"
   },
   author: {
     fontSize: 15,
-    color: "#888",
+    color: "var(--text-muted)",
     marginBottom: 16
   },
   meta: {
@@ -317,18 +328,13 @@ const styles = {
     marginBottom: 16,
     alignItems: "center"
   },
-  rating: {
-    fontSize: 14,
-    fontWeight: 600,
-    color: "#111"
-  },
   reviewCount: {
     fontSize: 13,
-    color: "#aaa"
+    color: "var(--text-muted)"
   },
   description: {
     fontSize: 14,
-    color: "#666",
+    color: "var(--text-secondary)",
     lineHeight: 1.7,
     maxWidth: 480
   },
@@ -337,20 +343,24 @@ const styles = {
     margin: "0 auto",
     padding: "40px 40px"
   },
-  sectionHeader: {
-    marginBottom: 20
-  },
+  sectionHeader: { marginBottom: 20 },
   sectionLabel: {
-    fontSize: 13,
-    fontWeight: 600,
-    letterSpacing: "0.06em",
+    fontSize: 11,
+    fontWeight: 500,
+    letterSpacing: "0.08em",
     textTransform: "uppercase",
-    color: "#111"
+    color: "var(--text-muted)"
   },
   empty: {
-    color: "#aaa",
+    color: "var(--text-muted)",
     fontSize: 14,
     padding: "40px 0"
+  },
+  reviewed: {
+    fontSize: 13,
+    color: "var(--text-muted)",
+    marginBottom: 24,
+    fontStyle: "italic"
   },
   reviewList: {
     display: "flex",
@@ -360,19 +370,16 @@ const styles = {
   },
   review: {
     padding: "20px 24px",
-    border: "1px solid #f0f0f0",
+    border: "0.5px solid var(--border)",
     borderRadius: 12,
-    background: "#fff"
+    background: "var(--bg-card)",
+    backdropFilter: "blur(16px)"
   },
   reviewTop: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 12
-  },
-  stars: {
-    fontSize: 16,
-    letterSpacing: 2
   },
   statusBadge: {
     fontSize: 12,
@@ -382,18 +389,24 @@ const styles = {
   },
   reviewContent: {
     fontSize: 14,
-    color: "#444",
+    color: "var(--text-secondary)",
     lineHeight: 1.7,
     marginBottom: 10
   },
   reviewDate: {
     fontSize: 12,
-    color: "#bbb"
+    color: "var(--text-muted)"
+  },
+  chapterBadge: {
+    fontSize: 12,
+    color: "var(--text-muted)",
+    fontWeight: 500,
+    marginBottom: 6
   },
   deleteReview: {
     background: "none",
     border: "none",
-    color: "#ccc",
+    color: "var(--text-muted)",
     fontSize: 13,
     cursor: "pointer",
     fontWeight: 600,
@@ -403,7 +416,7 @@ const styles = {
   editLabel: {
     display: "block",
     fontSize: 12,
-    color: "#999",
+    color: "var(--text-muted)",
     marginBottom: 6,
     fontWeight: 500
   },
@@ -411,56 +424,49 @@ const styles = {
     display: "block",
     width: "100%",
     padding: "10px 14px",
-    background: "#fff",
-    border: "1px solid #eee",
+    background: "var(--bg-input)",
+    border: "0.5px solid var(--border)",
     borderRadius: 8,
-    color: "#111",
+    color: "var(--text-primary)",
     fontSize: 14,
     marginBottom: 12,
     outline: "none",
     boxSizing: "border-box",
-    fontFamily: "inherit"
+    fontFamily: "inherit",
+    backdropFilter: "blur(8px)"
   },
   editBtn: {
     background: "none",
-    border: "1px solid #eee",
-    color: "#999",
+    border: "0.5px solid var(--border)",
+    color: "var(--text-muted)",
     fontSize: 12,
     cursor: "pointer",
     fontWeight: 500,
     padding: "3px 10px",
-    borderRadius: 6
+    borderRadius: 6,
+    fontFamily: "inherit"
   },
   saveBtn: {
     padding: "8px 20px",
-    background: "#111",
+    background: "var(--accent)",
     color: "#fff",
     border: "none",
     borderRadius: 8,
     fontSize: 13,
     fontWeight: 600,
-    cursor: "pointer"
+    cursor: "pointer",
+    fontFamily: "inherit"
   },
   cancelBtn: {
     padding: "8px 20px",
-    background: "#f0f0f0",
-    color: "#111",
-    border: "none",
+    background: "var(--bg-input)",
+    color: "var(--text-secondary)",
+    border: "0.5px solid var(--border)",
     borderRadius: 8,
     fontSize: 13,
     fontWeight: 500,
-    cursor: "pointer"
-  }, 
-  reviewed: {
-    fontSize: 13,
-    color: "#aaa",
-    marginBottom: 24,
-    fontStyle: "italic"
-  },
-  chapterBadge: {
-    fontSize: 12,
-    color: "#888",
-    fontWeight: 500
+    cursor: "pointer",
+    fontFamily: "inherit"
   },
   tierBtn: {
     display: "flex",

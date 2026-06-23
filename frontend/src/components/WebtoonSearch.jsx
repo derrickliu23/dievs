@@ -123,6 +123,7 @@ export default function WebtoonSearch({ onAdded }) {
     <div style={styles.container} ref={containerRef}>
       <div style={styles.inputWrapper}>
         <input
+          className="glass-input"
           style={styles.input}
           placeholder="search for a webtoon..."
           value={query}
@@ -188,101 +189,44 @@ export default function WebtoonSearch({ onAdded }) {
   )
 }
 
+// replace styles at the bottom
 const styles = {
-  container: {
-    position: "relative",   // makes the dropdown position relative to this div
-    marginBottom: 40
-  },
-  inputWrapper: {
-    position: "relative",
-    display: "flex",
-    alignItems: "center"
-  },
+  container: { position: "relative", marginBottom: 40 },
+  inputWrapper: { position: "relative", display: "flex", alignItems: "center" },
   input: {
     width: "100%",
-    padding: "12px 40px 12px 16px",  // right padding leaves room for clear button
-    background: "#f7f7f7",
-    border: "1px solid #eee",
+    padding: "12px 40px 12px 16px",
     borderRadius: 10,
-    color: "#111",
     fontSize: 14,
     outline: "none",
     fontFamily: "inherit"
   },
-  spinner: {
-    position: "absolute",
-    right: 14,
-    color: "#aaa",
-    fontSize: 13,
-    letterSpacing: 2
-  },
-  clearInput: {
-    position: "absolute",
-    right: 12,
-    background: "none",
-    border: "none",
-    color: "#bbb",
-    fontSize: 13,
-    cursor: "pointer",
-    fontWeight: 600,
-    padding: 0
-  },
+  spinner: { position: "absolute", right: 14, color: "var(--text-muted)", fontSize: 13, letterSpacing: 2 },
+  clearInput: { position: "absolute", right: 12, background: "none", border: "none", color: "var(--text-muted)", fontSize: 13, cursor: "pointer", fontWeight: 600, padding: 0 },
   dropdown: {
-    position: "absolute",   // floats over the page content below
+    position: "absolute",
     top: "calc(100% + 6px)",
     left: 0,
     right: 0,
-    background: "#fff",
-    border: "1px solid #eee",
     borderRadius: 12,
     overflow: "hidden",
-    boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
-    zIndex: 100             // sits on top of everything else
+    boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+    zIndex: 100,
+    backdropFilter: "blur(20px)",
+    background: "var(--bg-nav)",
+    border: "0.5px solid var(--border)"
   },
   result: {
     display: "flex",
     alignItems: "center",
     gap: 14,
     padding: "10px 16px",
-    borderBottom: "1px solid #f5f5f5",
-    transition: "background 0.15s"
+    borderBottom: "0.5px solid var(--border)"
   },
-  thumb: {
-    width: 36,
-    height: 50,
-    objectFit: "cover",
-    borderRadius: 4,
-    flexShrink: 0
-  },
-  info: {
-    flex: 1,
-    minWidth: 0   // prevents text from overflowing flex container
-  },
-  title: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: "#111",
-    marginBottom: 2,
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis"  // truncates long titles with ...
-  },
-  genres: {
-    fontSize: 11,
-    color: "#aaa",
-    marginBottom: 1
-  },
-  score: {
-    fontSize: 11,
-    color: "#2563EB",
-    fontWeight: 500
-  },
-  addBtn: {
-    padding: "6px 14px",
-    border: "none",
-    borderRadius: 8,
-    fontSize: 12,
-    fontWeight: 600,
-    flexShrink: 0
-  }
+  thumb: { width: 36, height: 50, objectFit: "cover", borderRadius: 4, flexShrink: 0 },
+  info: { flex: 1, minWidth: 0 },
+  title: { fontSize: 13, fontWeight: 500, color: "var(--text-primary)", marginBottom: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" },
+  genres: { fontSize: 11, color: "var(--text-muted)", marginBottom: 1 },
+  score: { fontSize: 11, color: "var(--accent)", fontWeight: 500 },
+  addBtn: { padding: "6px 14px", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 600, flexShrink: 0 }
 }

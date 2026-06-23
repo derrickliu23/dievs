@@ -7,7 +7,7 @@ import api from "../api"
 
 Chart.register(RadarController, RadialLinearScale, PointElement, LineElement, Filler, Tooltip)
 
-export default function Stats() {
+export default function Stats({ onThemeToggle, theme }) {
   const [webtoons, setWebtoons] = useState([])
   const [reviews, setReviews]   = useState([])
   const [loading, setLoading]   = useState(true)
@@ -76,6 +76,14 @@ export default function Stats() {
     const data   = genreStats.map(([, count]) => count)
     const maxVal = Math.max(...data)
 
+    // read current theme from the DOM
+    const isDark     = document.documentElement.getAttribute("data-theme") === "dark"
+    const labelColor = isDark ? "#aaa" : "#555"
+    const gridColor = isDark ?  "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.5)"
+    const fillColor  = isDark ? "rgba(29,158,117,0.15)"  : "rgba(15,110,86,0.10)"
+    const lineColor  = isDark ? "#1D9E75"                : "#0F6E56"
+    const dotColor   = isDark ? "#1D9E75"                : "#0F6E56"
+
     if (chartInst.current) chartInst.current.destroy()
 
     chartInst.current = new Chart(chartRef.current, {
@@ -84,10 +92,10 @@ export default function Stats() {
         labels,
         datasets: [{
           data,
-          backgroundColor: "rgba(63, 52, 137, 0.15)",
-          borderColor: "#3C3489",
+          backgroundColor: fillColor,
+          borderColor: lineColor,
           borderWidth: 2,
-          pointBackgroundColor: "#3C3489",
+          pointBackgroundColor: dotColor,
           pointRadius: 4,
           pointHoverRadius: 6
         }]
@@ -98,6 +106,11 @@ export default function Stats() {
         plugins: {
           legend: { display: false },
           tooltip: {
+            backgroundColor: isDark ? "rgba(20,20,30,0.9)" : "rgba(255,255,255,0.95)",
+            titleColor: isDark ? "#f0f0f0" : "#111",
+            bodyColor: isDark ? "#aaa" : "#555",
+            borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)",
+            borderWidth: 1,
             callbacks: {
               label: ctx => ` ${ctx.raw} title${ctx.raw !== 1 ? "s" : ""}`
             }
@@ -108,10 +121,11 @@ export default function Stats() {
             min: 0,
             max: maxVal + 1,
             ticks: { stepSize: 1, display: false },
-            grid: { color: "#f0f0f0" },
+            grid: { color: gridColor },
+            angleLines: { color: gridColor },
             pointLabels: {
               font: { size: 12, family: "Inter, sans-serif", weight: "500" },
-              color: "#111"
+              color: labelColor
             }
           }
         }
@@ -119,7 +133,7 @@ export default function Stats() {
     })
 
     return () => { if (chartInst.current) chartInst.current.destroy() }
-  }, [loading, webtoons, reviews])
+  }, [loading, webtoons, reviews, theme])  // ← theme in dependency array so it redraws on toggle
 
   const tierStats = getTierStats()
   const avgTier   = getAvgTier()
@@ -127,9 +141,14 @@ export default function Stats() {
 
   return (
     <div style={styles.page}>
-      <header style={styles.nav}>
+      <header className="glass-strong" style={{ ...styles.nav, position: "sticky", top: 0, zIndex: 50 }}>
         <button style={styles.back} onClick={() => navigate("/")}>← back</button>
-        <span style={styles.logo}>dievs</span>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <button style={styles.themeBtn} onClick={onThemeToggle}>
+            {theme === "dark" ? "☀️" : "🌙"}
+          </button>
+          <span style={styles.logo}>dievs</span>
+        </div>
       </header>
 
       <div style={styles.content}>
@@ -227,47 +246,67 @@ export default function Stats() {
 }
 
 const styles = {
-  page: { minHeight: "100vh", background: "#fff" },
+  page: { minHeight: "100vh" },
   nav: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "20px 40px",
-    borderBottom: "1px solid #f0f0f0"
+    padding: "16px 40px"
   },
-  logo: { fontSize: 20, fontWeight: 700, letterSpacing: "-0.03em" },
+  logo: { fontSize: 20, fontWeight: 500, letterSpacing: "-0.03em", color: "var(--text-primary)" },
   back: {
     background: "none",
     border: "none",
     fontSize: 14,
-    color: "#999",
+    color: "var(--text-muted)",
     cursor: "pointer",
     fontWeight: 500,
     fontFamily: "inherit"
   },
-  content: { maxWidth: 720, margin: "0 auto", padding: "48px 40px" },
-  title: { fontSize: 36, fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 6 },
-  subtitle: { fontSize: 15, color: "#888", marginBottom: 40 },
+  themeBtn: {
+    padding: "7px 10px",
+    background: "var(--bg-input)",
+    border: "0.5px solid var(--border)",
+    borderRadius: 8,
+    fontSize: 14,
+    cursor: "pointer",
+    backdropFilter: "blur(8px)"
+  },
+  content: { maxWidth: 760, margin: "0 auto", padding: "56px 40px" },
+  title: {
+    fontSize: 36,
+    fontWeight: 700,
+    letterSpacing: "-0.03em",
+    marginBottom: 6,
+    color: "var(--text-primary)"
+  },
+  subtitle: { fontSize: 15, color: "var(--text-muted)", marginBottom: 40 },
   cards: {
     display: "grid",
     gridTemplateColumns: "repeat(4, 1fr)",
-    gap: 12,
-    marginBottom: 48
+    gap: 16,
+    marginBottom: 56
   },
-  card: { background: "#f7f7f7", borderRadius: 10, padding: "16px 18px" },
-  cardLabel: { fontSize: 12, color: "#999", marginBottom: 6, fontWeight: 500 },
-  cardValue: { fontSize: 22, fontWeight: 600, color: "#111", letterSpacing: "-0.02em" },
-  section: { marginBottom: 48 },
+  card: {
+    background: "var(--bg-card)",
+    backdropFilter: "blur(16px)",
+    border: "0.5px solid var(--border)",
+    borderRadius: 12,
+    padding: "20px 22px"
+  },
+  cardLabel: { fontSize: 12, color: "var(--text-muted)", marginBottom: 6, fontWeight: 500 },
+  cardValue: { fontSize: 22, fontWeight: 600, color: "var(--text-primary)", letterSpacing: "-0.02em" },
+  section: { marginBottom: 64 },
   sectionLabel: {
-    fontSize: 13,
-    fontWeight: 600,
-    letterSpacing: "0.06em",
+    fontSize: 11,
+    fontWeight: 500,
+    letterSpacing: "0.08em",
     textTransform: "uppercase",
-    color: "#111",
+    color: "var(--text-muted)",
     marginBottom: 20
   },
-  chartWrap: { position: "relative", height: 360, width: "100%" },
-  tierChart: { display: "flex", gap: 12, alignItems: "flex-end", height: 160, paddingBottom: 24 },
+  chartWrap: { position: "relative", height: 420, width: "100%" },
+  tierChart: { display: "flex", gap: 16, alignItems: "flex-end", height: 200, paddingBottom: 28 },
   tierCol: {
     flex: 1,
     display: "flex",
@@ -276,12 +315,19 @@ const styles = {
     justifyContent: "flex-end",
     gap: 6
   },
-  tierCount: { fontSize: 12, color: "#999", height: 16 },
+  tierCount: { fontSize: 12, color: "var(--text-muted)", height: 16 },
   tierBar: { width: "100%", borderRadius: 6, transition: "height 0.3s" },
-  statusRow: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 },
-  statusCard: { background: "#f7f7f7", borderRadius: 10, padding: "20px", textAlign: "center" },
-  statusCount: { fontSize: 28, fontWeight: 600, letterSpacing: "-0.02em", marginBottom: 4 },
-  statusLabel: { fontSize: 13, color: "#888", marginBottom: 4, textTransform: "capitalize" },
-  statusPct: { fontSize: 12, color: "#bbb" },
-  empty: { color: "#aaa", fontSize: 14, padding: "60px 0", textAlign: "center" }
+  statusRow: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 },
+  statusCard: {
+    background: "var(--bg-card)",
+    backdropFilter: "blur(16px)",
+    border: "0.5px solid var(--border)",
+    borderRadius: 12,
+    padding: "28px 20px",
+    textAlign: "center"
+  },
+  statusCount: { fontSize: 32, fontWeight: 600, letterSpacing: "-0.02em", marginBottom: 6, color: "var(--text-primary)" },
+  statusLabel: { fontSize: 13, color: "var(--text-muted)", marginBottom: 4, textTransform: "capitalize" },
+  statusPct: { fontSize: 12, color: "var(--text-muted)" },
+  empty: { color: "var(--text-muted)", fontSize: 14, padding: "60px 0", textAlign: "center" }
 }

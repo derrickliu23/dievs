@@ -51,7 +51,9 @@ export default function WebtoonForm({ onSuccess }) {
 
 const styles = {
   form: {
-    background: "#f7f7f7",
+    background: "var(--bg-card)",
+    backdropFilter: "blur(16px)",
+    border: "0.5px solid var(--border)",
     borderRadius: 12,
     padding: "24px 28px",
     marginBottom: 32
@@ -68,23 +70,25 @@ const styles = {
     display: "block",
     width: "100%",
     padding: "10px 14px",
-    background: "#fff",
-    border: "1px solid #eee",
+    background: "var(--bg-input)",
+    border: "0.5px solid var(--border)",
     borderRadius: 8,
-    color: "#111",
+    color: "var(--text-primary)",
     fontSize: 14,
     marginBottom: 10,
     outline: "none",
-    boxSizing: "border-box"
+    boxSizing: "border-box",
+    backdropFilter: "blur(8px)"
   },
   button: {
     padding: "10px 24px",
-    background: "#111",
-    color: "#fff",
+    background: "var(--accent)",
+      color: "#fff",
     border: "none",
     borderRadius: 8,
     fontSize: 13,
     fontWeight: 600,
-    cursor: "pointer"
+    cursor: "pointer",
+    fontFamily: "inherit"
   }
 }

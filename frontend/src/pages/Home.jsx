@@ -8,7 +8,7 @@ import WebtoonSearch from "../components/WebtoonSearch"
 import Recommendations from "../components/Recommendations"
 import RatingSystemPicker from "../components/RatingSystemPicker"
 
-export default function Home() {
+export default function Home({ onThemeToggle, theme }) {
   const [webtoons, setWebtoons] = useState([])
   const [reviews, setReviews] = useState([])  // all reviews across all webtoons
   const [showForm, setShowForm] = useState(false)
@@ -95,15 +95,15 @@ export default function Home() {
 
   return (
     <div style={styles.page}>
-      <header style={styles.nav}>
+      {/* glass nav */}
+      <header className="glass-strong" style={styles.nav}>
         <span style={styles.logo}>dievs</span>
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <RatingSystemPicker onChange={() => forceUpdate(n => n + 1)} />
-          <button style={styles.statsBtn} onClick={() => navigate("/stats")}>
-            stats
-          </button>
-          <button style={styles.statsBtn} onClick={() => navigate("/wishlist")}>
-            wishlist
+          <button style={styles.navBtn} onClick={() => navigate("/stats")}>stats</button>
+          <button style={styles.navBtn} onClick={() => navigate("/wishlist")}>wishlist</button>
+          <button style={styles.themeBtn} onClick={onThemeToggle}>
+            {theme === "dark" ? "☀️" : "🌙"}
           </button>
           <button style={styles.addBtn} onClick={() => setShowForm(!showForm)}>
             {showForm ? "cancel" : "+ add manually"}
@@ -111,6 +111,7 @@ export default function Home() {
         </div>
       </header>
 
+      {/* hero */}
       <div style={styles.hero}>
         <h1 style={styles.heroTitle}>Your webtoon shelf.</h1>
         <p style={styles.heroSub}>Search, rate, and review as you read.</p>
@@ -129,71 +130,42 @@ export default function Home() {
               </span>
             </div>
 
-            {/* search your shelf */}
             <input
+              className="glass-input"
               style={styles.shelfSearch}
               placeholder="search your shelf..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
             />
 
-            {/* filter bar */}
             <div style={styles.filterBar}>
-              {/* status filter */}
-              <select
-                style={styles.filterSelect}
-                value={filters.status}
-                onChange={e => setFilters({ ...filters, status: e.target.value })}
-              >
+              {["status", "genre", "rating", "sort"].map((_, i) => null)}
+              <select className="glass-input" style={styles.filterSelect} value={filters.status} onChange={e => setFilters({ ...filters, status: e.target.value })}>
                 <option value="all">all statuses</option>
                 <option value="reading">reading</option>
                 <option value="completed">completed</option>
                 <option value="dropped">dropped</option>
               </select>
-
-              {/* genre filter */}
-              <select
-                style={styles.filterSelect}
-                value={filters.genre}
-                onChange={e => setFilters({ ...filters, genre: e.target.value })}
-              >
+              <select className="glass-input" style={styles.filterSelect} value={filters.genre} onChange={e => setFilters({ ...filters, genre: e.target.value })}>
                 <option value="all">all genres</option>
-                {allGenres.map(g => (
-                  <option key={g} value={g}>{g}</option>
-                ))}
+                {allGenres.map(g => <option key={g} value={g}>{g}</option>)}
               </select>
-
-              {/* rating filter */}
-              <select
-                style={styles.filterSelect}
-                value={filters.rating}
-                onChange={e => setFilters({ ...filters, rating: e.target.value })}
-              >
+              <select className="glass-input" style={styles.filterSelect} value={filters.rating} onChange={e => setFilters({ ...filters, rating: e.target.value })}>
                 <option value="all">all ratings</option>
-                <option value="5">★★★★★ only</option>
-                <option value="4">★★★★ and above</option>
-                <option value="3">★★★ and above</option>
-                <option value="2">★★ and above</option>
+                <option value="6">S only</option>
+                <option value="5">A and above</option>
+                <option value="4">B and above</option>
+                <option value="3">C and above</option>
               </select>
-
-              {/* sort dropdown */}
-              <select
-                style={styles.filterSelect}
-                value={sortBy}
-                onChange={e => setSortBy(e.target.value)}
-              >
+              <select className="glass-input" style={styles.filterSelect} value={sortBy} onChange={e => setSortBy(e.target.value)}>
                 <option value="date_added">newest added</option>
                 <option value="title">title (a-z)</option>
                 <option value="tier_high">highest tier</option>
                 <option value="tier_low">lowest tier</option>
-                <option value="chapter">most chapters read</option>
+                <option value="chapter">most chapters</option>
               </select>
-
-              {/* clear button — only show when filters are active */}
               {isFiltered && (
-                <button style={styles.clearBtn} onClick={clearFilters}>
-                  clear
-                </button>
+                <button style={styles.clearBtn} onClick={clearFilters}>clear</button>
               )}
             </div>
           </>
@@ -219,7 +191,6 @@ export default function Home() {
           ))}
         </div>
 
-        {/* recommendations — only shows when there's shelf data */}
         <Recommendations webtoons={webtoons} reviews={reviews} />
       </div>
     </div>
@@ -228,49 +199,73 @@ export default function Home() {
 
 const styles = {
   page: {
-    minHeight: "100vh",
-    background: "#fff"
+    minHeight: "100vh"
   },
   nav: {
+    position: "sticky",
+    top: 0,
+    zIndex: 50,
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "20px 40px",
-    borderBottom: "1px solid #f0f0f0"
+    padding: "16px 40px"
   },
   logo: {
-    fontSize: 20,
-    fontWeight: 700,
-    letterSpacing: "-0.03em",
-    color: "#111"
+    fontSize: 22,
+    fontWeight: 500,
+    letterSpacing: "-0.04em",
+    color: "var(--text-primary)"
+  },
+  navBtn: {
+    padding: "7px 14px",
+    background: "var(--bg-input)",
+    color: "var(--text-secondary)",
+    border: "0.5px solid var(--border)",
+    borderRadius: 8,
+    fontSize: 13,
+    fontWeight: 500,
+    cursor: "pointer",
+    backdropFilter: "blur(8px)",
+    fontFamily: "inherit"
+  },
+  themeBtn: {
+    padding: "7px 10px",
+    background: "var(--bg-input)",
+    border: "0.5px solid var(--border)",
+    borderRadius: 8,
+    fontSize: 14,
+    cursor: "pointer",
+    backdropFilter: "blur(8px)"
   },
   addBtn: {
-    padding: "8px 16px",
-    background: "#111",
+    padding: "7px 16px",
+    background: "var(--accent)",
     color: "#fff",
     border: "none",
     borderRadius: 8,
     fontSize: 13,
     fontWeight: 500,
-    cursor: "pointer"
+    cursor: "pointer",
+    fontFamily: "inherit"
   },
   hero: {
-    padding: "60px 40px 40px",
-    borderBottom: "1px solid #f0f0f0"
+    padding: "56px 40px 40px",
+    borderBottom: "0.5px solid var(--border)"
   },
   heroTitle: {
-    fontSize: 42,
-    fontWeight: 700,
-    letterSpacing: "-0.04em",
-    marginBottom: 8,
-    lineHeight: 1.1
+    fontSize: 48,
+    fontWeight: 500,
+    letterSpacing: "-0.05em",
+    lineHeight: 1.05,
+    marginBottom: 10,
+    color: "var(--text-primary)"
   },
   heroSub: {
-    fontSize: 16,
-    color: "#888"
+    fontSize: 15,
+    color: "var(--text-muted)"
   },
   content: {
-    maxWidth: 1000,
+    maxWidth: 1040,
     margin: "0 auto",
     padding: "40px 40px"
   },
@@ -282,40 +277,43 @@ const styles = {
     marginTop: 8
   },
   sectionLabel: {
-    fontSize: 13,
-    fontWeight: 600,
-    letterSpacing: "0.06em",
+    fontSize: 11,
+    fontWeight: 500,
+    letterSpacing: "0.08em",
     textTransform: "uppercase",
-    color: "#111"
+    color: "var(--text-muted)"
   },
   sectionCount: {
     fontSize: 13,
-    color: "#aaa"
+    color: "var(--text-muted)"
+  },
+  shelfSearch: {
+    width: "100%",
+    padding: "11px 16px",
+    borderRadius: 10,
+    fontSize: 14,
+    marginBottom: 12,
+    boxSizing: "border-box"
   },
   filterBar: {
     display: "flex",
-    gap: 10,
-    marginBottom: 24,
+    gap: 8,
+    marginBottom: 28,
     flexWrap: "wrap",
     alignItems: "center"
   },
   filterSelect: {
-    padding: "8px 14px",
-    background: "#f7f7f7",
-    border: "1px solid #eee",
+    padding: "7px 12px",
     borderRadius: 8,
-    color: "#111",
     fontSize: 13,
-    fontFamily: "inherit",
-    outline: "none",
     cursor: "pointer"
   },
   clearBtn: {
-    padding: "8px 14px",
+    padding: "7px 14px",
     background: "none",
-    border: "1px solid #eee",
+    border: "0.5px solid var(--border)",
     borderRadius: 8,
-    color: "#999",
+    color: "var(--text-muted)",
     fontSize: 13,
     fontWeight: 500,
     cursor: "pointer",
@@ -323,37 +321,13 @@ const styles = {
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-    gap: 24
+    gridTemplateColumns: "repeat(auto-fill, minmax(175px, 1fr))",
+    gap: 16
   },
   empty: {
-    color: "#aaa",
+    color: "var(--text-muted)",
     fontSize: 14,
     textAlign: "center",
     padding: "60px 0"
-  }, 
-  shelfSearch: {
-    width: "100%",
-    padding: "10px 16px",
-    background: "#f7f7f7",
-    border: "1px solid #eee",
-    borderRadius: 10,
-    color: "#111",
-    fontSize: 14,
-    outline: "none",
-    marginBottom: 14,
-    fontFamily: "inherit",
-    boxSizing: "border-box"
-  }, 
-  statsBtn: {
-    padding: "8px 16px",
-    background: "none",
-    color: "#111",
-    border: "1px solid #eee",
-    borderRadius: 8,
-    fontSize: 13,
-    fontWeight: 500,
-    cursor: "pointer",
-    fontFamily: "inherit"   // make sure this is here
   }
 }
