@@ -55,15 +55,11 @@ export default function WebtoonCard({ webtoon, review, onClick, onDeleted }) {
         </div>
       )}
 
-      {/* tier badge */}
-      {review && (
-        <div style={styles.tierPos}>
-          <TierBadge value={review.rating} size="sm" />
-        </div>
-      )}
-
       <div style={styles.info}>
-        <p style={styles.title}>{webtoon.title}</p>
+        <div style={styles.titleRow}>
+          <p style={styles.title}>{webtoon.title}</p>
+          {review && <TierBadge value={review.rating} size="sm" />}
+        </div>
         <p style={styles.author}>{webtoon.author}</p>
         <div style={styles.bottom}>
           {webtoon.genre && (
@@ -129,11 +125,24 @@ const styles = {
     letterSpacing: "0.05em",
     zIndex: 1
   },
-  tierPos: {
-    position: "absolute",
-    bottom: 56,
-    right: 10,
-    zIndex: 1
+  titleRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 6,
+    marginBottom: 2
+  },
+  title: {
+    fontSize: 13,
+    fontWeight: 500,
+    color: "var(--text-primary)",
+    lineHeight: 1.4,
+    letterSpacing: "-0.01em",
+    flex: 1,
+    minWidth: 0,           // allows text truncation
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap"
   },
   info: {
     padding: "10px 12px 14px"
